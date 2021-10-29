@@ -46,3 +46,14 @@ class Cleaner():
         X_out = X.copy()
         X_out.loc[:, self.columns_ordered] = self.transform(X)
         return X_out
+
+
+    # change CompetitionOpenSinceMonth CompetitionOpenSinceYear to days from sales
+    def competition_date(data):
+        data['CompetitionOpenDate'] = pd.to_datetime(dict(year=data.CompetitionOpenSinceYear,
+                                                          month=data.CompetitionOpenSinceMonth,
+                                                          day=1))
+        data['DateObj'] = pd.DatetimeIndex(data.Date)
+        data['SalesCompetitionLag'] = (data['DateObj'] - data['CompetitionOpenDate'])
+
+        return data
