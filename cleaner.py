@@ -57,3 +57,17 @@ class Cleaner():
         data['SalesCompetitionLag'] = (data['DateObj'] - data['CompetitionOpenDate'])
 
         return data
+
+
+    # change Promo2SinceYear Promo2SinceWeek to days from sales
+    def promo2_date(data):
+        dates = data.Promo2SinceYear * 100 + (data.Promo2SinceWeek - 1)
+        dates.fillna(0, inplace=True)
+        dates = dates.astype(int)
+        dates = dates.astype(str) + '0'
+        dates.replace('00', np.nan, inplace=True)
+        data['Promo2Date'] = pd.to_datetime(dates, format='%Y%W%w')
+        data['DateObj'] = pd.DatetimeIndex(data.Date)
+        data['Promo2Lag'] = (data['DateObj'] - data['Promo2Date'])
+
+        return data
