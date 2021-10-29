@@ -61,7 +61,7 @@ class Imputer():
     
     def __init__(self):
         self.zero_imputed = ["Open", "Promo", "SchoolHoliday"]
-        self.mode_imputed = ["StateHoliday", "StoreType", "Assortment"]
+        self.mode_imputed = ["StateHoliday", "StoreType", "Assortment", "PromoInterval", "Promo2"]
         self.median_imputed = ["CompetitionDistance"]
         self.columns_ordered = self.zero_imputed + self.mode_imputed + self.median_imputed
         self.transformers = None
@@ -112,8 +112,11 @@ class Cleaner():
     
     def clean(self, data):
         self.data = data
+        self._convert_date()
         self._correct_stateholiday()
         self._convert_competition_date()
+        self._convert_promo2_date()
+        self._drop_columns()
         self._set_dtypes()
         return self.data
     
@@ -141,25 +144,74 @@ class Cleaner():
 
     def _convert_competition_date(self):
         # change CompetitionOpenSinceMonth CompetitionOpenSinceYear to days from sales
-        self.data.loc[:, 'CompetitionOpenDate'] = pd.to_datetime(dict(
-            year=self.data.CompetitionOpenSinceYear,
-            month=self.data.CompetitionOpenSinceMonth,
+        self.data.loc[:, "CompetitionOpenDate"] = pd.to_datetime(dict(
+            year=self.data.loc[:, "CompetitionOpenSinceYear"],
+            month=self.data.loc[:, "CompetitionOpenSinceMonth"],
             day=1
             ))
-        self.data.loc[:, 'DateObj'] = pd.DatetimeIndex(self.data.Date)
-        self.data.loc[:, 'SalesCompetitionLag'] = (self.data.loc[:, 'DateObj'] - self.data.loc[:, 'CompetitionOpenDate'])
+        self.data.loc[:, "DateObj"] = pd.DatetimeIndex(self.data.loc[:, "Date"])
+        # self.data.loc[:, "SalesCompetitionLag"] = (self.data.loc[:, "DateObj"] - self.data.loc[:, "CompetitionOpenDate"])
 
+        lag = (self.data.loc[:, "DateObj"] - self.data.loc[:, "CompetitionOpenDate"]) / np.timedelta64(1, 'D')
+        lag[lag < 0] = 0
+        lag.fillna(-1, inplace=True)
+        self.data.loc[:, "SalesCompetitionLag"] = lag
 
-    # change Promo2SinceYear Promo2SinceWeek to days from sales
-    # run _convert_competition_date first, need data['DateObj'] column
-    def _promo2_date(self):
-        dates = self.data.Promo2SinceYear * 100 + (self.data.Promo2SinceWeek - 1)
+    
+    def _convert_date(self):
+        """This method splits the Date column into Year, Month, Day of the week and adds it's sin/cos features
+        """
+
+        data = self.data
+        # change to datetime
+        data.loc[:, "Date"] = pd.to_datetime(data.loc[:, "Date"])
+    
+        # helper function
+        def encode(data, col, max_val):
+            data[col + '_sin'] = np.sin(2 * np.pi * data[col]/max_val)
+            data[col + '_cos'] = np.cos(2 * np.pi * data[col]/max_val)
+            return data
+        
+        # datetime split in year, month, week, day of week and adding sin/cos
+        data["Year"] = pd.DatetimeIndex(data.loc[:,"Date"]).year
+        data["Month"] = pd.DatetimeIndex(data.loc[:,"Date"]).month
+        data = encode(data, "Month", 12)
+        data["Weekday"] = data.loc[:,"Date"].dt.dayofweek
+        data = encode(data, "Weekday", 365)
+
+        # store updates
+        self.data = data
+    
+
+    def _convert_promo2_date(self):
+        # change Promo2SinceYear Promo2SinceWeek to days from sales
+        # run _convert_competition_date first, need data['DateObj'] column
+        dates = self.data.loc[:, "Promo2SinceYear"] * 100 + (self.data.loc[:, "Promo2SinceWeek"] - 1)
         dates.fillna(0, inplace=True)
         dates = dates.astype(int)
         dates = dates.astype(str) + '0'
-        dates.replace('00', np.nan, inplace=True)
-        self.data['Promo2Date'] = pd.to_datetime(dates, format='%Y%W%w')
-        # self.data['DateObj'] = pd.DatetimeIndex(self.data.Date)
-        self.data['Promo2Lag'] = (self.data['DateObj'] - self.data['Promo2Date'])
+        dates.replace("00", np.nan, inplace=True)
+        self.data.loc[:, "Promo2Date"] = pd.to_datetime(dates, format="%Y%W%w")
+        lag = (self.data.loc[:, "DateObj"] - self.data.loc[:, "Promo2Date"]) / np.timedelta64(1, 'D')
+        lag[lag < 0] = 0
+        lag.fillna(-1, inplace=True)
+        self.data.loc[:, "Promo2Lag"] = lag
 
-        # return data
+    
+    def _drop_columns(self):
+        # ready to drop DayofWeek and Date
+        columns_to_drop = [
+            "DayOfWeek",
+            "Date",
+            "DateObj",
+            "Month",
+            "Weekday",
+            "CompetitionOpenSinceYear",
+            "CompetitionOpenSinceMonth",
+            "CompetitionOpenDate",
+            "Promo2SinceYear",
+            "Promo2SinceWeek",
+            "Promo2Date",
+        ]
+        self.data.drop(columns_to_drop, axis=1, inplace=True)
+        
