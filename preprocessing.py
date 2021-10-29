@@ -108,10 +108,12 @@ class Cleaner():
     
     def __init__(self):
         self.data = None
+        self.dates = None
     
     
     def clean(self, data):
         self.data = data
+        self.dates = data.loc[:, "Date"]
         self._convert_date()
         self._correct_stateholiday()
         self._convert_competition_date()
@@ -138,7 +140,8 @@ class Cleaner():
         self.data = self.data.astype({
             "StateHoliday": "category",
             "StoreType": "category",
-            "Assortment": "category"
+            "Assortment": "category",
+            "PromoInterval": "category",
         })
     
 
