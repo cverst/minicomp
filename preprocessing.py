@@ -1,4 +1,3 @@
-from _typeshed import NoneType
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -248,8 +247,8 @@ class Cleaner:
         self.data.loc[:, "SalesCompetitionLag"] = lag  # create lag feature
 
     def _convert_date(self) -> None:
-        """Split Date into Year, Month, and Weekday. Subsequently map Month
-        and Weekday to circular features using sine/cosine.
+        """Split Date into Year, Month, Week, and Weekday. Subsequently map
+        Month, Week, and Weekday to circular features using sine/cosine.
         """
 
         data = self.data
@@ -275,8 +274,10 @@ class Cleaner:
         # Datetime split in year, month, week, weekday and adding sin/cos
         data["Year"] = pd.DatetimeIndex(data.loc[:, "Date"]).year
         data["Month"] = pd.DatetimeIndex(data.loc[:, "Date"]).month
+        data["Week"] = pd.DatetimeIndex(data.loc[:, "Date"]).week
         data["Weekday"] = data.loc[:, "Date"].dt.dayofweek
         data = encode(data, "Month", 12)
+        data = encode(data, "Week", 53)
         data = encode(data, "Weekday", 365)
 
         # Store updates to data
@@ -323,6 +324,7 @@ class Cleaner:
             "Date",
             "DateObj",
             "Month",
+            "Week",
             "Weekday",
             "CompetitionOpenSinceYear",
             "CompetitionOpenSinceMonth",
