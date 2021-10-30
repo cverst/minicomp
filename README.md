@@ -5,30 +5,39 @@ This mini competition is adapted from the Kaggle Rossman challenge.
 ## How to run the files
 
 1. Clone the repository, create environment and install requirements file
-
+```
 git clone https://github.com/cverst/minicomp
-
+```
 We recommend to use virtualenv for development:
 
 Start by installing virtualenv if you don't have it
 
+```
 pip install virtualenv
-
+```
 Once installed access the project folder
 
+```
 cd folder_name
+```
 
 Create a virtual environment
 
+```
 virtualenv venv_minicomp
+```
 
 Enable the virtual environment
 
+```
 source venv_minicomp/bin/activate
+```
 
 Install the python dependencies on the virtual environment
 
+```
 pip install -r requirements.txt
+```
 
 2. Make sure the store.csv ,train.csv and holdout.csv are present in the data folder.
 
