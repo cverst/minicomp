@@ -1,16 +1,47 @@
 ## Rossman Kaggle Mini-Competition
 
-This mini competition is adapted from the Kaggle Rossman challenge.  Please refrain from looking at the challenge on Kaggle until after you have finished - this will allow you to get a true measurement of where you are at as a data scientist.
+This mini competition is adapted from the Kaggle Rossman challenge.
 
-## Setup
+## How to run the files
 
-```bash
-#  during the competition run
-python data.py
+1. Clone the repository, create environment and install requirements file
 
-#  at test time run
-python data.py --test 1
-```
+git clone https://github.com/cverst/minicomp
+
+We recommend to use virtualenv for development:
+
+Start by installing virtualenv if you don't have it
+
+pip install virtualenv
+
+Once installed access the project folder
+
+cd folder_name
+
+Create a virtual environment
+
+virtualenv venv_minicomp
+
+Enable the virtual environment
+
+source venv_minicomp/bin/activate
+
+Install the python dependencies on the virtual environment
+
+pip install -r requirements.txt
+
+2. Make sure the store.csv ,train.csv and holdout.csv are present in the data folder.
+
+3. Run the notebook which engages the preprocessing.py file.
+
+Preprocessing.py creates
+- Cleaner
+- Merger
+- Imputer
+classes to clean and process the data for the models to run.
+
+4. The predictions score can be found in the end of the notebook.
+
 
 ## Dataset
 
@@ -56,64 +87,3 @@ Promo2 - Promo2 is a continuing and consecutive promotion for some stores: 0 = s
 Promo2Since[Year/Week] - describes the year and calendar week when the store started participating in Promo2
 PromoInterval - describes the consecutive intervals Promo2 is started, naming the months the promotion is started anew. E.g. "Feb,May,Aug,Nov" means each round starts in February, May, August, November of any given year for that store
 ```
-
-The holdout test period is from 2014-08-01 to 2015-07-31 - the holdout test dataset is the same format as `train.csv`, as is called `holdout.csv`.
-
-After running `python data.py -- test 1`, the folder `data` will look like:
-
-```bash
-data
-├── holdout.csv
-├── rossmann-store-sales.zip
-├── store.csv
-└── train.csv
-```
-
-## Scoring Criteria
-
-The competition is scored based on a composite of predictive accuracy and reproducibility.
-
-## Predictive accuracy
-
-The task is to predict the `Sales` of a given store on a given day.
-
-Submissions are evaluated on the root mean square percentage error (RMSPE):
-
-![](./assets/rmspe.png)
-
-```python
-def metric(preds, actuals):
-    preds = preds.reshape(-1)
-    actuals = actuals.reshape(-1)
-    assert preds.shape == actuals.shape
-    return 100 * np.linalg.norm((actuals - preds) / actuals) / np.sqrt(preds.shape[0])
-```
-
-Zero sales days are ignored in scoring - part of your pipeline should look for these rows and drop them (in both test & train)
-
-The team scores will be ranked - the highest score (lowest RMSPE) will receive a score of 10 for the scoring criteria section.
-
-Each lower score (higher RMSPE) will receive a score of 10-(1 * number in ranking). If they are ranked second, score will be 10-2 = 8. 
-
-## Reproducibility
-
-The entire model should be completely reproducible - to score this the teacher will clone your repository and follow the instructions as per the readme.  All teams start out with a score of 10.  One point is deducted for each step not included in the repo.
-
-## Advice
-
-Commit early and often
-
-Notebooks don't merge easily!
-
-Visualize early
-
-Look at the predictions your model is getting wrong - can you engineer a feature for those samples?
-
-Models
-- baseline (average sales per store from in training data)
-- random forest
-- XGBoost
-
-Use your DSR instructor(s)
-- you are not alone - they are here to help with both bugs and data science advice
-- git issues, structuring the data on disk, models to try, notebook problems and conda problems are all things we have seen before
