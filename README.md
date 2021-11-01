@@ -1,6 +1,6 @@
 ## DSR Mini-Competition
 
-This mini competition is adapted from the Kaggle "[Rossmann Store Sales](https://www.kaggle.com/c/rossmann-store-sales)" challenge. Additional information on the competition can be found on [https://github.com/ADGEfficiency/minicomp-rossman].
+This mini competition is adapted from the Kaggle "[Rossmann Store Sales](https://www.kaggle.com/c/rossmann-store-sales)" challenge. Additional information on the competition can be found on https://github.com/ADGEfficiency/minicomp-rossman.
 
 The goal of this challenge is to predict future sales based on past sales and store information. As evaluation metric we use the root mean square percentage error (RMSPE), which provides a simple way of comparing the results of different groups in the competition.
 
