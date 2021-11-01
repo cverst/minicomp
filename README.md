@@ -14,8 +14,11 @@ git clone https://github.com/cverst/minicomp
 ```
 
 2. Create an environment
+
 Our code is tested for Python 3.8 but other Python 3 releases should also work.
+
 **Using conda**
+
 With Anaconda or miniconda installed, create an environment by running
 ```
 conda create -n minicomp_env python=3.8
@@ -24,7 +27,9 @@ The environment can be enabled with
 ```
 conda activate minicomp_env
 ```
+
 **Using pip**
+
 If virtualenv is not installed, start with
 ```
 pip install virtualenv
@@ -39,6 +44,7 @@ source minicomp_env/bin/activate
 ```
 
 3. Install Jupyter
+
 Assuming your environment name is "minicomp_env" run:
 ```
 pip install jupyter
@@ -46,6 +52,7 @@ python -m ipykernel install --user --name minicomp_env --display-name "minicomp_
 ```
 
 4. Install requirements
+
 Access the project folder
 ```
 cd minicomp
@@ -60,6 +67,7 @@ pip install -r requirements.txt
 ## Running the code
 
 1. Jupyter notebook
+
 Start Jupyter notebook with
 ```
 jupyter notebook
@@ -74,6 +82,7 @@ First, three custom classes imported from preprocessing.py (Merger, Cleaner, Imp
 After preprocessing, we perform hyperparameter tuning. However, the corresponding code takes very long to run. It is best to skip the cell relating to hyperparameter tuning (indicated in the notebook) and use the hard-coded best hyperparameters provided after that part.
 
 3. Predictions
+
 The score RMSPE for our model is shown at the end of the notebook.
 
 
